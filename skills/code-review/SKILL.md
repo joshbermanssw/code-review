@@ -1,12 +1,12 @@
 ---
-name: review-panel
+name: code-review
 description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) with a panel of specialist reviewers run as parallel sub-agents: Spec, Standards and Correctness always, plus Security (security), Architecture (architecture), Fallow (fallow static analysis) and Visual (the rendered UI) when the diff earns them, and up to 5 Ad Hoc reviewers for niche questions only when needed. Reports one recommendation: what to fix before merge and what to raise as comments. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 argument-hint: "<fixed point> [security|architecture|visual|skip security|skip architecture|skip visual|skip ad-hoc]"
 ---
 
 ## Runtime compatibility
 
-Invoke as `$review-panel` in Codex or `/review-panel` in Claude Code. Slash-prefixed skill examples below use Claude Code syntax; in Codex, load the named skill with its arguments from the user message. Resolve bundled files relative to this `SKILL.md`, including when installed through a symlink.
+Invoke as `$code-review` in Codex or `/code-review` in Claude Code. Slash-prefixed skill examples below use Claude Code syntax; in Codex, load the named skill with its arguments from the user message. Resolve bundled files relative to this `SKILL.md`, including when installed through a symlink.
 
 Use the current host's available shell, file, question, skill-loading, and delegation tools. Claude tool names and model tiers below are examples, not portable API identifiers. In Codex, load a referenced skill by reading its `SKILL.md`; delegate with the native agent tool and inherit the session model unless the user or applicable instructions request a supported override. If delegation is unavailable, do ordinary steps in-session; report an independent review as unavailable rather than claiming you ran one. Pass these runtime rules to delegates.
 

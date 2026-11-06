@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds the review-panel dashboard from the ledger, as one self-contained HTML file.
+"""Builds the code-review dashboard from the ledger, as one self-contained HTML file.
 
 Usage: dashboard.py [--out <file>]
 Prints the path it wrote. The default is reviews.html in the ledger folder.

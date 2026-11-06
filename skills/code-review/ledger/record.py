@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Saves one review-panel run to the ledger as a JSON file.
+"""Saves one code-review run to the ledger as a JSON file.
 
 Usage: record.py < run.json
 Exit 0: saved, prints the path. Exit 1: rejected, prints why, saves nothing.

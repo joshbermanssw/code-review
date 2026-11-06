@@ -1,8 +1,8 @@
 {
-  "name": "review-panel",
+  "name": "code-review",
   "description": "Review a diff with a panel of specialist sub-agents, and get one recommendation: what to fix before merge and what to raise as comments.",
   "version": "0.1.0",
   "author": { "name": "Josh Berman" },
-  "repository": "https://github.com/joshbermanssw/review-panel",
+  "repository": "https://github.com/joshbermanssw/code-review",
   "license": "MIT"
 }

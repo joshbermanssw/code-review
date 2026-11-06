@@ -6,7 +6,7 @@
 
 ## Matt Pocock's code-review skill
 
-`skills/review-panel/` began as the `code-review` skill from https://github.com/mattpocock/skills. The Standards reviewer's brief comes from it. That skill is under this license:
+`skills/code-review/` began as the `code-review` skill from https://github.com/mattpocock/skills. The Standards reviewer's brief comes from it. That skill is under this license:
 
 ```
 MIT License

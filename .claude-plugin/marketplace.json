@@ -1,9 +1,9 @@
 {
-  "name": "review-panel",
+  "name": "code-review",
   "owner": { "name": "Josh Berman" },
   "plugins": [
     {
-      "name": "review-panel",
+      "name": "code-review",
       "source": "./",
       "description": "Review a diff with a panel of specialist sub-agents, and get one recommendation."
     }

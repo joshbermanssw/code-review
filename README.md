@@ -1,4 +1,4 @@
-# Review Panel
+# Code Review
 
 Reviews a diff with a panel of specialist sub-agents, then gives you one recommendation: what to fix before merge, and what to raise as comments.
 
@@ -9,13 +9,13 @@ Spec, Standards and Correctness always run. Security, architecture, static analy
 In Claude Code:
 
 ```
-/plugin marketplace add joshbermanssw/review-panel
-/plugin install review-panel@review-panel
+/plugin marketplace add joshbermanssw/code-review
+/plugin install code-review@code-review
 ```
 
-Then run `/review-panel:review-panel <base branch>`.
+Then run `/code-review:code-review <base branch>`.
 
-For other agents, use `npx skills add joshbermanssw/review-panel`.
+For other agents, use `npx skills add joshbermanssw/code-review`.
 
 ## Requirements
 
@@ -44,7 +44,7 @@ It leaves out nits, and any Minor that isn't worth holding the merge for. Nothin
 
 Each review saves a small JSON record: reviewer names, counts, tokens and time, never finding text or code. Records stay on your machine, in `~/.code-review-ledger`. To keep them somewhere else, set `CODE_REVIEW_LEDGER`.
 
-To see which reviewers find real problems and what they cost, run `skills/review-panel/ledger/dashboard.py`. It writes `reviews.html` to the ledger folder.
+To see which reviewers find real problems and what they cost, run `skills/code-review/ledger/dashboard.py`. It writes `reviews.html` to the ledger folder.
 
 ## Licence
 
