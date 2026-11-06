@@ -46,6 +46,8 @@ th:first-child, td:first-child, .left { text-align:left; }
 .kept { background:var(--kept); } .pbi { background:var(--pbi); } .dropped { background:var(--dropped); }
 .legend { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--muted); margin:10px 0 0; }
 .legend i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; }
+.of { color:var(--muted); font-size:12px; }
+th.group { text-align:center; color:var(--ink); border-bottom:1px solid var(--line); }
 .empty { padding:48px 24px; text-align:center; color:var(--muted); }
 """
 
@@ -79,6 +81,17 @@ def summarise(runs):
             kept = item.get("kept") or {}
             row["blocking"] += kept.get("critical", 0) + kept.get("major", 0)
             row["kept"] += total(kept)
+            for severity, count in kept.items():
+                row["share_" + severity] += count
+            if "raised" in item:
+                raised = item["raised"]
+                moved = item.get("another_pbi", 0)  # only Critical and Major findings get moved
+                raised_blocking = raised.get("critical", 0) + raised.get("major", 0)
+                row["checked"] += raised_blocking
+                row["survived"] += min(kept.get("critical", 0) + kept.get("major", 0) + moved, raised_blocking)
+                for severity in ("critical", "major"):
+                    row["raised_" + severity] += raised.get(severity, 0)
+                    row["held_" + severity] += min(kept.get(severity, 0), raised.get(severity, 0))
             row["pbi"] += item.get("another_pbi", 0)
             row["omitted"] += item.get("omitted", 0)
             # Only records that say what was dropped count toward "Held up".
@@ -124,6 +137,45 @@ def reviewer_row(name, row):
     return f'<tr><td>{escape(name)}</td>{tds}<td class="left">{bar(row)}</td></tr>'
 
 
+def percent(part, whole):
+    return f"{part / whole:.0%}" if whole else "–"
+
+
+def useful_row(name, row):
+    """One reviewer's accuracy, severity mix and real blockers found."""
+    blockers = row["blocking"] + row["pbi"]
+    cells = [
+        row["runs"],
+        f'<b>{percent(row["survived"], row["checked"])}</b> <span class="of">{row["survived"]}/{row["checked"]}</span>',
+        percent(row["held_critical"], row["raised_critical"]),
+        percent(row["held_major"], row["raised_major"]),
+        percent(row["share_critical"], row["kept"]),
+        percent(row["share_major"], row["kept"]),
+        percent(row["share_minor"], row["kept"]),
+        percent(row["share_question"], row["kept"]),
+        f"{blockers / row['runs'] * 100:.0f}" if row["runs"] else "–",
+        compact(row["tokens"] // blockers) if row["costed"] and blockers else "–",
+    ]
+    tds = "".join(f"<td>{cell}</td>" for cell in cells)
+    return f"<tr><td>{escape(name)}</td>{tds}</tr>"
+
+
+def useful_table(rows):
+    scored = [(n, r) for n, r in rows.items() if r["checked"] or r["kept"]]
+    if not scored:
+        return ""
+    scored.sort(key=lambda kv: -(kv[1]["blocking"] + kv[1]["pbi"]) / max(kv[1]["runs"], 1))
+    body = "".join(useful_row(name, row) for name, row in scored)
+    return ('<h2>Which reviewers are most useful</h2><div class="panel"><table><thead>'
+            '<tr><th></th><th></th><th colspan="3" class="group">Accuracy</th><th colspan="4" class="group">Share of reported findings</th><th colspan="2" class="group">Payoff</th></tr>'
+            "<tr><th>Reviewer</th><th>Reviews</th><th>Overall</th><th>Critical</th><th>Major</th>"
+            "<th>Critical</th><th>Major</th><th>Minor</th><th>Question</th><th>Blockers per 100 reviews</th><th>Tokens per blocker</th>"
+            f"</tr></thead><tbody>{body}</tbody></table></div>"
+            '<p class="note">Accuracy is the share of the Critical and Major findings a reviewer raised that were still Critical or Major '
+            "after verification, in the report or moved to another PBI. Minors and Questions aren't independently checked, so they have no accuracy score. "
+            "A blocker is a Critical or Major that survived. Sorted by blockers per 100 reviews. Small counts swing a lot, so read the x/y next to Overall.</p>")
+
+
 def run_row(run):
     when = escape(str(run.get("at", ""))[:16].replace("T", " "))
     target = f"#{run['pr']}" if run.get("pr") else str(run.get("sha", ""))[:7]
@@ -164,10 +216,10 @@ def render(runs, folder):
     all_rows = rows.values()
     blocking = sum(r["blocking"] for r in all_rows)
     pbi = sum(r["pbi"] for r in all_rows)
-    dropped = sum(r["dropped"] for r in all_rows)
+    overturned = sum(r["checked"] - r["survived"] for r in all_rows)
     changes = sum(1 for r in runs if r.get("verdict") == "request-changes")
     stats = [(len(runs), "reviews"), (changes, "requested changes"), (blocking, "Critical or Major reported"),
-             (pbi, "moved to another PBI"), (dropped, "dropped as wrong")]
+             (pbi, "moved to another PBI"), (overturned, "Critical or Major overturned")]
     stat_html = "".join(f"<div><b>{n}</b><span>{label}</span></div>" for n, label in stats)
 
     order = sorted(rows.items(), key=lambda kv: (-kv[1]["runs"], kv[0]))
@@ -194,7 +246,7 @@ def render(runs, folder):
               '<th>When</th><th class="left">Reviewed</th><th class="left">Caller</th><th class="left">Verdict</th>'
               "<th>Reviewers</th><th>Reported</th><th>Another PBI</th><th>Dropped</th><th>Tokens</th>"
               f"</tr></thead><tbody>{recent}</tbody></table></div>")
-    return (f'{head}<div class="stats">{stat_html}</div>{reviewers}{ad_hoc}{latest}</main></body></html>')
+    return (f'{head}<div class="stats">{stat_html}</div>{useful_table(rows)}{reviewers}{ad_hoc}{latest}</main></body></html>')
 
 
 def build(out=None):
