@@ -1,0 +1,11 @@
+{
+  "name": "review-panel",
+  "owner": { "name": "Josh Berman" },
+  "plugins": [
+    {
+      "name": "review-panel",
+      "source": "./",
+      "description": "Review a diff with a panel of specialist sub-agents, and get one recommendation."
+    }
+  ]
+}
