@@ -2,7 +2,7 @@
 """Saves one code-review run to the ledger as a JSON file.
 
 Usage: record.py < run.json
-Exit 0: saved, prints the path. Exit 1: rejected, prints why, saves nothing.
+Exit 0: saved, prints the path, and rebuilds the dashboard. Exit 1: rejected, prints why, saves nothing.
 
 Records hold numbers and short labels only. Any field not listed here is rejected, and
 strings must match a short pattern, so finding text, code or secrets can't get in.
@@ -124,6 +124,13 @@ def main():
     path = folder / f"{now:%Y-%m-%d-%H%M%S}-{repo}-{target}.json"
     path.write_text(json.dumps(run, indent=2) + "\n")
     print(path)
+    # The record is what matters: a failed rebuild only warns.
+    try:
+        sys.dont_write_bytecode = True  # keep the skill folder free of __pycache__
+        from dashboard import build
+        build()
+    except Exception as err:
+        print(f"saved, but the dashboard didn't rebuild: {err}", file=sys.stderr)
     return 0
 
 

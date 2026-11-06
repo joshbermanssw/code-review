@@ -168,7 +168,7 @@ After the report, pipe one record to [ledger/record.py](ledger/record.py) so the
 
 ### Ledger and dashboard
 
-Records go in `$CODE_REVIEW_LEDGER`, or `~/.code-review-ledger` if that isn't set. To store them somewhere else, set that variable in your shell profile. To see the dashboard, run [ledger/dashboard.py](ledger/dashboard.py), which needs only Python 3 and writes `reviews.html` to that folder (or to `--out <file>`).
+Records go in `$CODE_REVIEW_LEDGER`, or `~/.code-review-ledger` if that isn't set. To store them somewhere else, set that variable in your shell profile. Each saved record rebuilds the dashboard, `reviews.html`, in that folder. To rebuild it yourself, run [ledger/dashboard.py](ledger/dashboard.py), which needs only Python 3 and can write elsewhere with `--out <file>`.
 
 ## Re-running after fixes
 

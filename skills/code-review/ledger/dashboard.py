@@ -81,7 +81,10 @@ def summarise(runs):
             row["kept"] += total(kept)
             row["pbi"] += item.get("another_pbi", 0)
             row["omitted"] += item.get("omitted", 0)
-            row["dropped"] += item.get("dropped", 0)
+            # Only records that say what was dropped count toward "Held up".
+            if "dropped" in item:
+                row["dropped"] += item["dropped"]
+                row["verified"] += total(kept) + item.get("another_pbi", 0) + item.get("omitted", 0) + item["dropped"]
             if item.get("tokens") is not None:
                 row["tokens"] += item["tokens"]
                 row["costed"] += 1
@@ -111,8 +114,7 @@ def bar(row):
 
 def reviewer_row(name, row):
     found = row["kept"] + row["pbi"] + row["omitted"]
-    checked = found + row["dropped"]
-    held = f"{found / checked:.0%}" if checked else "–"
+    held = f"{1 - row['dropped'] / row['verified']:.0%}" if row["verified"] else "–"
     avg_tokens = compact(row["tokens"] // row["costed"]) if row["costed"] else "–"
     avg_time = f"{row['seconds'] / row['timed'] / 60:.1f}m" if row["timed"] else "–"
     per_finding = compact(row["tokens"] // found) if row["costed"] and found else "–"
@@ -178,7 +180,7 @@ def render(runs, folder):
         '<div class="legend"><span><i class="kept"></i>Reported</span><span><i class="pbi"></i>Another PBI</span>'
         '<span><i class="dropped"></i>Dropped</span></div>'
         '<p class="note">Held up is the share of findings that survived verification. '
-        "Left out means Minors and nits kept out of the report.</p>")
+        "Left out means Minors and nits kept out of the report. A dash means no review recorded what it dropped.</p>")
 
     topics = ad_hoc_topics(runs)
     ad_hoc = ""
@@ -195,12 +197,18 @@ def render(runs, folder):
     return (f'{head}<div class="stats">{stat_html}</div>{reviewers}{ad_hoc}{latest}</main></body></html>')
 
 
-def main():
+def build(out=None):
+    """Writes the page and returns its path. record.py calls this after every save."""
     folder = ledger_dir()
-    out = Path(sys.argv[2]) if len(sys.argv) == 3 and sys.argv[1] == "--out" else folder / "reviews.html"
     folder.mkdir(parents=True, exist_ok=True)
+    out = out or folder / "reviews.html"
     out.write_text(render(load_runs(folder), folder))
-    print(out)
+    return out
+
+
+def main():
+    out = Path(sys.argv[2]) if len(sys.argv) == 3 and sys.argv[1] == "--out" else None
+    print(build(out))
     return 0
 
 
