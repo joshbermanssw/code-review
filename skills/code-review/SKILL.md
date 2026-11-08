@@ -120,7 +120,7 @@ Then the report, and nothing else: no per-reviewer sections, status lines, talli
 
 Only post when the user asks. **Strictly inline comments and suggestions, never a body comment:** post the findings the user picked as one review (`gh api repos/{owner}/{repo}/pulls/<n>/reviews` with a `comments` array) and leave its `body` empty. Don't use `gh pr comment`, and don't paste the report into the PR.
 
-- Anchor each finding on its `file:line`, one comment per finding, written in the "Writing a finding" shape.
+- Anchor each finding on its `file:line`, one comment per finding, written in the "Writing a posted comment" shape.
 - When the fix is a concrete line change, write it as a GitHub ```` ```suggestion ```` block so the author can apply it.
 - A finding with no line in the diff (such as something missing) goes on the closest changed line. If there is none, don't post it: tell the user in the chat.
 - If GitHub refuses the review without a body, stop and tell the user rather than adding one.
@@ -143,6 +143,26 @@ Example:
 ```
 
 When reporting back after acting on findings, use the same shape per finding: a bold heading for the problem, one or two sentences on what was wrong, then what you changed, or why you left it (and what would change that).
+
+### Writing a posted comment
+
+A posted comment is shorter than a finding in the report. The author is already looking at the line, and the full trace stays in the chat, where they can ask for it.
+
+Write one or two plain sentences: what goes wrong from the user's or reader's point of view, then the shortest hint at why. No severity tag or bold title.
+
+- Leave out the mechanism, the call chain, the evidence and how you found it. Don't repeat the anchor, since the comment sits on the line.
+- Ending on a question is fine, and often better than an instruction.
+- Skip the **Fix:** line. When the fix is a concrete line change, the ```` ```suggestion ```` block carries it.
+
+Example:
+
+````markdown
+A disable now takes up to 5 minutes to reach content and assets, because `getApp` trusts the cached authorizer result without this check. Could we put it back?
+
+```suggestion
+if (app.disabled) throw new ForbiddenError();
+```
+````
 
 ### 8. Record the run
 
