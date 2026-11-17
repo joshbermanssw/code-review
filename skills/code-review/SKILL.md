@@ -148,7 +148,7 @@ When reporting back after acting on findings, use the same shape per finding: a 
 
 A posted comment is shorter than a finding in the report. The author is already looking at the line, and the full trace stays in the chat, where they can ask for it.
 
-Write one or two plain sentences: what goes wrong from the user's or reader's point of view, then the shortest hint at why. No severity tag or bold title.
+Start with the finding's final severity in square brackets (`[Critical]`, `[Major]`, `[Minor]` or `[Question]`), so the author can tell what holds the merge from what is only a question. Then write one or two plain sentences: what goes wrong from the user's or reader's point of view, then the shortest hint at why. No bold title.
 
 - Leave out the mechanism, the call chain, the evidence and how you found it. Don't repeat the anchor, since the comment sits on the line.
 - Ending on a question is fine, and often better than an instruction.
@@ -157,7 +157,7 @@ Write one or two plain sentences: what goes wrong from the user's or reader's po
 Example:
 
 ````markdown
-A disable now takes up to 5 minutes to reach content and assets, because `getApp` trusts the cached authorizer result without this check. Could we put it back?
+[Major] A disable now takes up to 5 minutes to reach content and assets, because `getApp` trusts the cached authorizer result without this check. Could we put it back?
 
 ```suggestion
 if (app.disabled) throw new ForbiddenError();
