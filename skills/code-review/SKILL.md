@@ -79,6 +79,7 @@ Issue every chosen reviewer's sub-agent call together, in a single message, in t
 - Use the model its file names, and the effort too when it names one.
 - Paste in its **Brief**, its **Output** contract, the shared [rubric.md](rubric.md), and everything its **Hand it** list asks for. The sub-agent has no other access to these.
 - Always include the diff command, the commit list, and one line on anything you already suspect, so it doesn't spend its budget rediscovering it.
+- **Split Correctness on a big diff.** One reviewer with 400 words cannot trace thousands of lines. When the diff changes more than about 1,500 lines of code (`git diff --shortstat`, leaving out lockfiles, snapshots and generated files), run one Correctness sub-agent per area: group the changed files by package or feature folder into two to four areas of similar size, tests with the code they test. Give each its area's paths and one line on what the others cover. They run in parallel with everyone else. In the ledger, record them as one `Correctness` entry with the counts summed.
 
 ### 6. Verify
 

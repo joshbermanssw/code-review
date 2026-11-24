@@ -32,7 +32,13 @@ Start the app with the repo's own dev command on a port nothing else uses. Never
 
 Capture with headless Playwright only. Don't open a visible browser window or use the person's signed-in browser. Use the repo's own Playwright if it has one; otherwise `npx --yes playwright`, running `npx --yes playwright install chromium --only-shell` first if the browser is missing. For each surface the diff touches, and anything that shares its space, capture a phone width (375px) and a desktop width (1280px). Also capture each state the diff adds or changes (active, empty, error, long content) in the layout a user will really meet, such as a sidebar with a collection open rather than an empty admin. Open and look at every image before reporting on it.
 
-Then use what the diff changed, in the same headless browser: click, type and submit through it the way a user would, and note what happens. A screenshot shows how it looks; only using it shows whether it works. Report UX or accessibility problems from behaviour you saw, or a standard the code demonstrably breaks. A concern from reading the code alone is at most a **minor**.
+Then use what the diff changed, in the same headless browser: click, type and submit through it the way a user would, and note what happens. Three checks screenshots at rest miss, each whenever the diff touches such a part:
+
+- **Floating, pinned and absolutely placed parts** (a popover, a floating toolbar, a sheet's close button or handle, a sticky header): scroll the container they sit in, and the page, and look again. A part that should follow its anchor follows it and goes when the anchor leaves view; a part that should stay pinned stays reachable. Do it with content taller than the screen.
+- **Controls inside a sideways scroller** (a wide table, a tab strip): at 375px, check every control the diff adds can be seen and reached without knowing to scroll.
+- **Hover-only information** (a `title` or tooltip that explains why something is disabled or what it does): with a touch device profile, check there is another way to read it.
+
+For a shared bar or header the diff adds a state to (failed, saving, a longer label), capture that state at a tablet width (768px) as well: that is where it crowds its neighbours. A screenshot shows how it looks; only using it shows whether it works. Report UX or accessibility problems from behaviour you saw, or a standard the code demonstrably breaks. A concern from reading the code alone is at most a **minor**.
 
 If a PR exists, tick off what the diff changes on screen against its screenshots: every new element, each state the diff adds, and the before state where one existed. Download and look at each one. Anything visible that no image shows, or a missing screenshot, is a **minor**. With no visible change, say no screenshots are needed.
 
